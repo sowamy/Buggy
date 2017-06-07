@@ -24,7 +24,8 @@ void appendNode( nodePtr *root, int nid, char *nname, float nprice, char *nstore
 void initializeList( nodePtr *root );
 int isEmpty( nodePtr root );
 float sumList( nodePtr *root );
-void deleteItem( nodePtr *root, int id );
+void deleteNode( nodePtr *root, int id );
+void changeNode( nodePtr *root, int nid, char *nname, float nprice, char *nstore );
 //-----------------------------------------------------------------------------------
 // Function: main
 // Description: Primary source of control
@@ -73,12 +74,34 @@ int main( void )
                         scanf( "%s", &storeKey );
 
                         appendNode( &root, idKey, &nameKey, priceKey, &storeKey );
+                        menuChoice = 1;
+                        break;
+                    case 2:
+                        printTitle();
+                        printf( "\nPRODUCT ID\n--> " );
+                        scanf( "%d", &idKey );
+
+                        printTitle();
+                        printf( "\nPRODUCT NAME\n--> " );
+                        scanf( "%s", &nameKey );
+
+                        printTitle();
+                        printf( "\nPRODUCT PRICE\n--> $" );
+                        scanf( "%f", &priceKey );
+
+                        printTitle();
+                        printf( "\nPRODUCT STORE\n--> " );
+                        scanf( "%s", &storeKey );
+
+                        changeNode( &root, idKey, &nameKey, priceKey, &storeKey );
+                        menuChoice = 1;
                         break;
                     case 3:
                         printTitle();
                         printf( "\nPRODUCT ID\n--> " );
                         scanf( "%d", &idKey );
-                        deleteItem( &root, idKey );
+                        deleteNode( &root, idKey );
+                        menuChoice = 1;
                         break;
                     case 0:
                         menuChoice = 1;
@@ -255,7 +278,7 @@ float sumList( nodePtr *root )
     return sum;
 } // END FUNCTION sumList
 //-----------------------------------------------------------------------------------
-void deleteItem( nodePtr *root, int nid )
+void deleteNode( nodePtr *root, int nid )
 {
     nodePtr currentPtr;
     nodePtr previousPtr;
@@ -280,10 +303,35 @@ void deleteItem( nodePtr *root, int nid )
             previousPtr->nextProduct = currentPtr->nextProduct;
             free( tempPtr );
             printf( "Deleted...\n" );
-        } else {
-            printTitle();
-            printf( "Object not found...\n" );
-        } // END if...else
+        } // END if
     } // END if...else
 } // END FUNCTION deleteItem
+//-----------------------------------------------------------------------------------
+void changeNode( nodePtr *root, int nid, char *nname, float nprice, char *nstore )
+{
+    nodePtr currentPtr;
+
+    if( nid == ( *root )->id ) {
+        ( *root )->name = malloc( strlen( nname ) + 1 );
+        ( *root )->price = nprice;
+        ( *root )->store = malloc( strlen( nstore ) + 1 );
+        strcpy( ( *root )->name, nname );
+        strcpy( ( *root )->store, nstore );
+    } else {
+        currentPtr = ( *root )->nextProduct;
+
+        while( currentPtr != NULL && currentPtr->id != nid ) {
+            currentPtr = currentPtr->nextProduct;
+        } // END while
+
+        if( currentPtr != NULL ) {
+            currentPtr->name = malloc( strlen( nname ) + 1 );
+            strcpy( currentPtr->name, nname );
+            currentPtr->price = nprice;
+            currentPtr->store = malloc( strlen( nstore ) + 1 );
+            strcpy( currentPtr->store, nstore );
+        } // END if
+    } // END if...else
+
+} // END FUNCTION changeNode
 //-----------------------------------------------------------------------------------
