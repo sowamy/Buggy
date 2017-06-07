@@ -15,6 +15,7 @@ struct product{
 typedef struct product node;  // node
 typedef node *nodePtr;     // *nodePtr
 //-----------------------------------------------------------------------------------
+// Function Prototypes
 void printTitle( void );
 int mainMenu( void );
 int editMenu( void );
@@ -23,7 +24,10 @@ void appendNode( nodePtr *root, int nid, char *nname, float nprice, char *nstore
 void initializeList( nodePtr *root );
 int isEmpty( nodePtr root );
 float sumList( nodePtr *root );
+void deleteItem( nodePtr *root, int id );
 //-----------------------------------------------------------------------------------
+// Function: main
+// Description: Primary source of control
 int main( void )
 {
     bool on = true;
@@ -68,7 +72,13 @@ int main( void )
                         printf( "\nPRODUCT STORE\n--> " );
                         scanf( "%s", &storeKey );
 
-                        appendNode( &root, idKey, nameKey, priceKey, storeKey );
+                        appendNode( &root, idKey, &nameKey, priceKey, &storeKey );
+                        break;
+                    case 3:
+                        printTitle();
+                        printf( "\nPRODUCT ID\n--> " );
+                        scanf( "%d", &idKey );
+                        deleteItem( &root, idKey );
                         break;
                     case 0:
                         menuChoice = 1;
@@ -101,6 +111,13 @@ int main( void )
     return 0;
 }
 //-----------------------------------------------------------------------------------
+// Function: mainMenu
+// Description: Prints the Main Menu and returns the user's choice from the menu
+// Inputs: None
+// Outputs:
+//      - menuChoice  := Users choice to the menu.
+// Return:
+//      - (int) menuChoice
 int mainMenu( void )
 {
     int menuChoice;
@@ -134,7 +151,7 @@ int editMenu( void )
 //-----------------------------------------------------------------------------------
 void printTitle( void )
 {
-    system( "clear" );
+    system( "cls" );
     puts( "-----------------------------------------------------------" );
     puts( "                       BUGGY 1.0                           " );
     puts( "-----------------------------------------------------------" );
@@ -167,10 +184,12 @@ void appendNode( nodePtr *root, int nid, char *nname, float nprice, char *nstore
     nodePtr currentPtr = *root;
     nodePtr previousPtr;
     nodePtr newPtr = malloc( sizeof( node ) );
+    newPtr->name = malloc( strlen( nname ) + 1 );
+    newPtr->store = malloc( strlen( nstore ) + 1 );
     newPtr->id = nid;
-    newPtr->name = nname;
     newPtr->price = nprice;
-    newPtr->store = nstore;
+    strcpy( newPtr->name, nname );
+    strcpy( newPtr->store, nstore );
 
     if( currentPtr == NULL ) {
         *root = newPtr;
@@ -235,4 +254,36 @@ float sumList( nodePtr *root )
 
     return sum;
 } // END FUNCTION sumList
+//-----------------------------------------------------------------------------------
+void deleteItem( nodePtr *root, int nid )
+{
+    nodePtr currentPtr;
+    nodePtr previousPtr;
+    nodePtr tempPtr;
+
+    if( nid == ( *root )->id ) {
+        tempPtr = *root;
+        *root = ( *root )->nextProduct;
+        free( tempPtr );
+    } else {
+
+        previousPtr = *root;
+        currentPtr = ( *root )->nextProduct;
+
+        while( currentPtr != NULL && currentPtr->id != nid ) {
+            previousPtr = currentPtr;
+            currentPtr = currentPtr->nextProduct;
+        } // END while
+
+        if( currentPtr != NULL ) {
+            tempPtr = currentPtr;
+            previousPtr->nextProduct = currentPtr->nextProduct;
+            free( tempPtr );
+            printf( "Deleted...\n" );
+        } else {
+            printTitle();
+            printf( "Object not found...\n" );
+        } // END if...else
+    } // END if...else
+} // END FUNCTION deleteItem
 //-----------------------------------------------------------------------------------
